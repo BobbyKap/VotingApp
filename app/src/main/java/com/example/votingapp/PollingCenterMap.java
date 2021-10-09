@@ -5,7 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.votingapp.directionhelpers.FetchURL;
 import com.example.votingapp.directionhelpers.TaskLoadedCallback;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,12 +31,15 @@ public class PollingCenterMap extends AppCompatActivity implements OnMapReadyCal
     MarkerOptions place1, place2;
     Polyline currentPolyLine;
     String Address;
+    private RequestQueue queue;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_polling_center_map);
+        queue = Volley.newRequestQueue(this);
         btnGetDirection = findViewById(R.id.btnGetDirection);
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapNearBy);
         mapFragment.getMapAsync(this);
@@ -43,6 +53,23 @@ public class PollingCenterMap extends AppCompatActivity implements OnMapReadyCal
 
         String url = getUrl(place1.getPosition(), place2.getPosition(), "driving");
         new FetchURL(PollingCenterMap.this).execute(url, "driving");
+
+        final TextView textView = (TextView) findViewById(R.id.textView7);
+
+        String urlAddress = getUrlAddress(Address);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        textView.setText("Response is: "+ response.substring(0,500));
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                textView.setText("That didn't work!");
+            }
+        });
     }
 
     @Override

@@ -21,15 +21,10 @@ public class EnterAddress extends AppCompatActivity {
 
         AddressInput = (EditText) findViewById(R.id.Address);
         ButtonInput = (Button) findViewById(R.id.button2);
-        ButtonInput.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Address = AddressInput.getText().toString();
-            }
-        });
     }
 
     public void sendMessage2(View view) {
+        Address = AddressInput.getText().toString();
         Intent intent2 = new Intent(this, Notifications.class);
         intent2.putExtra("message", Address);
         startActivity(intent2);
