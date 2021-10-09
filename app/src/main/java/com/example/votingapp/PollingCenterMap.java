@@ -23,7 +23,7 @@ public class PollingCenterMap extends AppCompatActivity implements OnMapReadyCal
     Button btnGetDirection;
     MarkerOptions place1, place2;
     Polyline currentPolyLine;
-    double x1, y1, x2, y2;
+    String Address;
 
 
     @Override
@@ -31,11 +31,15 @@ public class PollingCenterMap extends AppCompatActivity implements OnMapReadyCal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_polling_center_map);
         btnGetDirection = findViewById(R.id.btnGetDirection);
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapNearBy);
         mapFragment.getMapAsync(this);
 
-        place1 = new MarkerOptions().position(new LatLng((x1), (y1))).title("Current Location");
-        place2 = new MarkerOptions().position(new LatLng((x2), (y2))).title("Polling Center");
+        Bundle bundle = getIntent().getExtras();
+        String message = bundle.getString("message");
+        Address = message;
+
+        place1 = new MarkerOptions().position(new LatLng((26.365520), (-80.165810))).title("Current Location");
+        place2 = new MarkerOptions().position(new LatLng((26.384470), (-80.144287))).title("Polling Center");
 
         String url = getUrl(place1.getPosition(), place2.getPosition(), "driving");
         new FetchURL(PollingCenterMap.this).execute(url, "driving");
@@ -54,7 +58,13 @@ public class PollingCenterMap extends AppCompatActivity implements OnMapReadyCal
         String mode = "mode=" + directionMode;
         String paramaters = str_orgin + "&" + str_dest + "&" + mode;
         String output = "json";
-        String url = "https://maps.googleapis.com/maps/api/directions" + output + "?" + paramaters + "&key=" + "AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss";
+        String url = "https://maps.googleapis.com/maps/api/directions" + output + "?" + paramaters + "&key=" + getString(R.string.google_maps_key);
+        return url;
+    }
+
+    private String getUrlAddress(String Address) {
+        Address = Address.replace(" ", "+");
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" +Address+ "&key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss";
         return url;
     }
 

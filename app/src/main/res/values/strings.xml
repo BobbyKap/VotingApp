@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Voting App</string>
+    <string name="google_maps_key">AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss</string>
 </resources>
