@@ -25,7 +25,7 @@ public class BaseInfo extends AppCompatActivity {
     }
 
     public void sendMessagePollingCenter(View view) {
-        Intent intent4 = new Intent(this, PollingCenterMap.class);
+        Intent intent4 = new Intent(this, PollingLocation.class);
         intent4.putExtra("message", messageThrough);
         startActivity(intent4);
     }
