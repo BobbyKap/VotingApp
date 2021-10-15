@@ -23,7 +23,7 @@ public class Notifications extends AppCompatActivity {
         messageThrough = message;
     }
 
-    private void addNotification() {
+    /*private void addNotification() {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.notification_icon)
@@ -37,10 +37,10 @@ public class Notifications extends AppCompatActivity {
         // Add as notification
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(0, builder.build());
-    }
+    }*/
 
     public void sendMessage3(View view) {
-        addNotification();
+        //addNotification();
         Intent intent2 = new Intent(this, BaseInfo.class);
         intent2.putExtra("message", messageThrough);
         startActivity(intent2);

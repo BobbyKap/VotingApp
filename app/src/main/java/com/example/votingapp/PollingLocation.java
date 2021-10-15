@@ -20,6 +20,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -30,7 +31,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+
+
 
 
 
@@ -39,9 +43,10 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
     private ActivityPollingLocationBinding binding;
-    LatLng origin = new LatLng(30.739834, 76.782702);
-    LatLng dest = new LatLng(30.705493, 76.801256);
+    LatLng origin = new LatLng(26.384473, -80.144280);
+    LatLng dest = new LatLng(26.365520, -80.165810);
     ProgressDialog progressDialog;
+    String messageThrough;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +61,26 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         
         Bundle bundle = getIntent().getExtras();
         String message = bundle.getString("message");
+        messageThrough = message;
+        AsyncTask<String, Void, String> data = getData();
+        Log.d("data",getData().toString());
+        try {
+            JSONObject jsonObject = new JSONObject(data.toString());
+            Object jsonObject2 = jsonObject.get("results");
+            Log.d("jsonObject2", jsonObject2.toString());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d("jsonObject2", "hello");
+        }
+    }
+
+    private AsyncTask<String, Void, String> getData(){
+        String url = getAddressUrl(messageThrough);
+        Log.d("url", url + "");
+        DownloadTask downloadTask = new DownloadTask();
+        AsyncTask<String, Void, String> return1 = downloadTask.execute(url);
+        return return1;
     }
 
     private void drawPolyLines(){
@@ -186,13 +211,29 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         String sensor = "sensor=false";
         String mode = "mode=driving";
         // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&CA&key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss";
 
         // Output format
         String output = "json";
 
         // Building the url to the web service
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+
+
+        return url;
+    }
+
+    private String getAddressUrl(String address) {
+        address = address.replace(" ", "%20");
+
+        // Building the parameters to the web service
+        String parameters = "address=" + address + "&" + "&CA&key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss";
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/geocode/" + output + "?" + parameters;
 
 
         return url;
