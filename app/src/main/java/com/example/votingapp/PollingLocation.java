@@ -58,20 +58,24 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         drawPolyLines();
-        
+
+        //----------------------------------------------------------------------------------------
+
         Bundle bundle = getIntent().getExtras();
         String message = bundle.getString("message");
         messageThrough = message;
+        //Returns
         AsyncTask<String, Void, String> data = getData();
-        Log.d("data",getData().toString());
+        String json = data.toString();
+        json = json.replace("\\\"","'");
         try {
-            JSONObject jsonObject = new JSONObject(data.toString());
+            JSONObject jsonObject = new JSONObject(json.substring(1,json.length()-1));
             Object jsonObject2 = jsonObject.get("results");
             Log.d("jsonObject2", jsonObject2.toString());
 
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.d("jsonObject2", "hello");
+            Log.e("jsonObject2", String.valueOf(e));
         }
     }
 
