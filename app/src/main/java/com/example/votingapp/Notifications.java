@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -15,6 +16,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+
+import java.util.Calendar;
 
 public class Notifications extends AppCompatActivity {
 
@@ -31,6 +34,11 @@ public class Notifications extends AppCompatActivity {
     }
 
     public void sendMessage3(View view) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY,6);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,1);
+
         CheckBox checkBox = findViewById(R.id.checkBox);
         if(checkBox.isChecked()) {
             Intent intent = new Intent(this, BaseInfo.class);
