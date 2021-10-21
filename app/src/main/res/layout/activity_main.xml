@@ -19,7 +19,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/button345"
         android:layout_width="150dp"
         android:layout_height="98dp"
         android:onClick="sendMessage"

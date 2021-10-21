@@ -1,27 +1,26 @@
 package com.example.votingapp;
 
+import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+
 import androidx.fragment.app.FragmentActivity;
 
-import android.os.Bundle;
-
+import com.example.votingapp.databinding.ActivityPollingLocationBinding;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.example.votingapp.databinding.ActivityPollingLocationBinding;
-
-import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.os.AsyncTask;
-import android.util.Log;
-
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.json.JSONException;
 import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,11 +30,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-
-
-
 
 
 public class PollingLocation extends FragmentActivity implements OnMapReadyCallback {
@@ -67,16 +62,9 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         //Returns
         AsyncTask<String, Void, String> data = getData();
         String json = data.toString();
-        json = json.replace("\\\"","'");
-        try {
-            JSONObject jsonObject = new JSONObject(json.substring(1,json.length()-1));
-            Object jsonObject2 = jsonObject.get("results");
-            Log.d("jsonObject2", jsonObject2.toString());
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e("jsonObject2", String.valueOf(e));
-        }
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        //String json1 = gson.fromJson(json);
     }
 
     private AsyncTask<String, Void, String> getData(){
