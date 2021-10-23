@@ -25,6 +25,8 @@ android {
     }
 }
 dependencies {
+    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation "com.googlecode.json-simple:json-simple:1.1"
     implementation "androidx.core:core:1.6.0"

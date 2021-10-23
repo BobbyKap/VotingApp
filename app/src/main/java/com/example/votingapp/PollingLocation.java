@@ -6,9 +6,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.votingapp.databinding.ActivityPollingLocationBinding;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -18,9 +21,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,6 +34,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 
 public class PollingLocation extends FragmentActivity implements OnMapReadyCallback {
@@ -59,20 +69,33 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         Bundle bundle = getIntent().getExtras();
         String message = bundle.getString("message");
         messageThrough = message;
-        //Returns
-        AsyncTask<String, Void, String> data = getData();
-        String json = data.toString();
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-        //String json1 = gson.fromJson(json);
-    }
 
-    private AsyncTask<String, Void, String> getData(){
-        String url = getAddressUrl(messageThrough);
-        Log.d("url", url + "");
-        DownloadTask downloadTask = new DownloadTask();
-        AsyncTask<String, Void, String> return1 = downloadTask.execute(url);
-        return return1;
+        //Returns
+        DataClass datafile = new DataClass();
+        try {
+            datafile.run(getAddressUrl(messageThrough), new Callback() {
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        String response2 = response.toString();
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode jsonNode = mapper.readTree(response2);
+                        String jsonNode2 = jsonNode.get("results").asText();
+                        Log.d("Debug4",jsonNode2);
+
+                    } else {
+                        // Request not successful
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void drawPolyLines(){
@@ -215,22 +238,6 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         return url;
     }
 
-    private String getAddressUrl(String address) {
-        address = address.replace(" ", "%20");
-
-        // Building the parameters to the web service
-        String parameters = "address=" + address + "&" + "&CA&key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss";
-
-        // Output format
-        String output = "json";
-
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/geocode/" + output + "?" + parameters;
-
-
-        return url;
-    }
-
     /**
      * A method to download json data from url
      */
@@ -268,5 +275,36 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
             urlConnection.disconnect();
         }
         return data;
+    }
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+public class DataClass{
+    final OkHttpClient client = new OkHttpClient();
+    Call run(String url, Callback callback) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Call call = client.newCall(request);
+        call.enqueue(callback);
+        return call;
+
+    }
+}
+
+
+    private String getAddressUrl(String address) {
+        address = address.replace(" ", "%20");
+
+        // Building the parameters to the web service
+        String parameters = "address=" + address + "&" + "&CA&key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss";
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/geocode/" + output + "?" + parameters;
+        Log.d("url2", url + "");
+
+        return url;
     }
 }

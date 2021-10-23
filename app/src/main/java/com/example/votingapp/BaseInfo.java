@@ -3,6 +3,7 @@ package com.example.votingapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
@@ -17,6 +18,13 @@ public class BaseInfo extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         String message = bundle.getString("message");
         messageThrough = message;
+    }
+
+    public void back(View view){
+        Intent intent2 = new Intent(this, Notifications.class);
+        SharedPreferences preferences = getSharedPreferences("Address", 0);
+        preferences.edit().remove("key2").commit();
+        startActivity(intent2);
     }
 
     public void sendMessageElectionInfo(View view) {
