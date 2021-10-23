@@ -5,11 +5,15 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import java.net.URL;
+import java.util.HashMap;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.votingapp.databinding.ActivityPollingLocationBinding;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -64,40 +68,23 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
         drawPolyLines();
 
-        //----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         Bundle bundle = getIntent().getExtras();
         String message = bundle.getString("message");
         messageThrough = message;
 
         //Returns
-        DataClass datafile = new DataClass();
         try {
-            datafile.run(getAddressUrl(messageThrough), new Callback() {
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        String response2 = response.toString();
-                        ObjectMapper mapper = new ObjectMapper();
-                        JsonNode jsonNode = mapper.readTree(response2);
-                        String jsonNode2 = jsonNode.get("results").asText();
-                        Log.d("Debug4",jsonNode2);
-
-                    } else {
-                        // Request not successful
-                    }
-                }
-
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-                }
-            });
-        } catch (IOException e) {
+            final JsonNode node = new ObjectMapper().readTree(getAddressUrl(messageThrough));
+            JsonNode node2 = node.get("results");
+            Log.d("Debugplz", node2.toString());
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
 
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
     private void drawPolyLines(){
         progressDialog = new ProgressDialog(PollingLocation.this);
         progressDialog.setMessage("Please Wait, Polyline between two locations is building.");
@@ -112,7 +99,6 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         // Start downloading json data from Google Directions API
         downloadTask.execute(url);
     }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -128,8 +114,6 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(origin, 15));
 
     }
-
-
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -213,7 +197,6 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
             }
         }
     }
-
     private String getDirectionsUrl(LatLng origin, LatLng dest) {
 
         // Origin of route
@@ -237,10 +220,6 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
 
         return url;
     }
-
-    /**
-     * A method to download json data from url
-     */
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
@@ -278,19 +257,8 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
     }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------
 public class DataClass{
-    final OkHttpClient client = new OkHttpClient();
-    Call run(String url, Callback callback) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
 
-        Call call = client.newCall(request);
-        call.enqueue(callback);
-        return call;
-
-    }
 }
-
 
     private String getAddressUrl(String address) {
         address = address.replace(" ", "%20");
