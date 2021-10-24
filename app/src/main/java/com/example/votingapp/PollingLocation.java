@@ -75,11 +75,14 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         messageThrough = message;
 
         //Returns
+        DataClass runner = new DataClass();
         try {
-            final JsonNode node = new ObjectMapper().readTree(getAddressUrl(messageThrough));
+            final JsonNode node = new ObjectMapper().readTree(getAddressJson(messageThrough));
             JsonNode node2 = node.get("results");
             Log.d("Debugplz", node2.toString());
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -256,11 +259,24 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         return data;
     }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------
-public class DataClass{
+public class DataClass extends AsyncTask<String, Void, String> {
+    OkHttpClient client = new OkHttpClient();
 
+    @Override
+    protected String doInBackground(String... url) {
+        Request request = new Request.Builder()
+                .url(String.valueOf(url))
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            return response.body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
-
-    private String getAddressUrl(String address) {
+    private String getAddressJson(String address) throws IOException {
         address = address.replace(" ", "%20");
 
         // Building the parameters to the web service
@@ -273,6 +289,8 @@ public class DataClass{
         String url = "https://maps.googleapis.com/maps/api/geocode/" + output + "?" + parameters;
         Log.d("url2", url + "");
 
-        return url;
+        DataClass runner = new DataClass();
+        String url2 = runner.doInBackground(url);
+        return url2;
     }
 }
