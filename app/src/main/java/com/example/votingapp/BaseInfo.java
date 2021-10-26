@@ -29,6 +29,7 @@ public class BaseInfo extends AppCompatActivity {
 
     public void sendMessageElectionInfo(View view) {
         Intent intent3 = new Intent(this, ElectionInfo.class);
+        intent3.putExtra("message", messageThrough);
         startActivity(intent3);
     }
 

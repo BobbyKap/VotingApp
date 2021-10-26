@@ -1,5 +1,6 @@
 package com.example.votingapp;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -38,6 +39,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -52,14 +54,68 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
     private ActivityPollingLocationBinding binding;
-    LatLng origin = new LatLng(26.384473, -80.144280);
-    LatLng dest = new LatLng(26.365520, -80.165810);
+    LatLng origin = new LatLng(0, 0);
+    LatLng dest = new LatLng(0, 0);
     ProgressDialog progressDialog;
     String messageThrough;
+    String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle bundle = getIntent().getExtras();
+        String message = bundle.getString("message");
+        messageThrough = message;
+
+        //Returns
+        OriginClass originRunner = new OriginClass();
+        DestinationClass destinationRunner = new DestinationClass();
+        try {
+            @SuppressLint("WrongThread") final JsonNode node = new ObjectMapper().readTree((originRunner.execute(messageThrough)).get());
+            String nodeLat = node.get("results").get(0).get("geometry").get("location").get("lat").toString();
+            String nodeLng = node.get("results").get(0).get("geometry").get("location").get("lng").toString();
+            double LatReal = Double.parseDouble(nodeLat);
+            double LngReal = Double.parseDouble(nodeLng);
+            origin = new LatLng(LatReal, LngReal);
+            Log.d("Origin", String.valueOf(origin));
+            Log.d("DebugLat", String.valueOf(LatReal));
+            Log.d("DebugLng", String.valueOf(LngReal));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            @SuppressLint("WrongThread") final JsonNode node = new ObjectMapper().readTree((destinationRunner.execute(messageThrough)).get());
+            if(node.get("election").get("id") != null){
+                id = node.get("election").get("id").toString();
+                String nodeLat = node.get("pollingLocations").get(0).get("latitude").toString();
+                String nodeLng = node.get("pollingLocations").get(0).get("longitude").toString();
+                double LatReal = Double.parseDouble(nodeLat);
+                double LngReal = Double.parseDouble(nodeLng);
+                dest = new LatLng(LatReal, LngReal);
+                Log.d("Dest", String.valueOf(dest));
+                Log.d("DebugLat", String.valueOf(LatReal));
+                Log.d("DebugLng", String.valueOf(LngReal));
+            }
+            else if (Integer.parseInt(node.get("error").get("code").toString()) == 400) {
+                Log.d("ElectionAvailable:", "No Elections are available right now.");
+            }
+        } catch(JsonProcessingException e){
+                e.printStackTrace();
+            } catch(IOException e){
+                e.printStackTrace();
+            } catch(InterruptedException e){
+                e.printStackTrace();
+            } catch(ExecutionException e){
+                e.printStackTrace();
+            }
         binding = ActivityPollingLocationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -70,21 +126,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
 
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        Bundle bundle = getIntent().getExtras();
-        String message = bundle.getString("message");
-        messageThrough = message;
 
-        //Returns
-        DataClass runner = new DataClass();
-        try {
-            final JsonNode node = new ObjectMapper().readTree(getAddressJson(messageThrough));
-            JsonNode node2 = node.get("results");
-            Log.d("Debugplz", node2.toString());
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -259,38 +301,58 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         return data;
     }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------
-public class DataClass extends AsyncTask<String, Void, String> {
-    OkHttpClient client = new OkHttpClient();
+    public class OriginClass extends AsyncTask<String, Void, String> {
+        OkHttpClient client = new OkHttpClient();
 
-    @Override
-    protected String doInBackground(String... url) {
-        Request request = new Request.Builder()
-                .url(String.valueOf(url))
-                .build();
+        @Override
+        protected String doInBackground(String... address) {
+            StringBuffer sb = new StringBuffer();
+            for(int i = 0; i < address.length; i++) {
+                sb.append(address[i]);
+            }
+            String addressReal = sb.toString();
+            addressReal = addressReal.replace(" ", "%20");
+            String parameters = "address=" + addressReal + "&" + "&CA&key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss";
+            String output = "json";
+            String url = "https://maps.googleapis.com/maps/api/geocode/" + output + "?" + parameters;
+            Log.d("url5", url);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            try (Response response = client.newCall(request).execute()) {
+                return response.body().string();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
-}
-    private String getAddressJson(String address) throws IOException {
-        address = address.replace(" ", "%20");
 
-        // Building the parameters to the web service
-        String parameters = "address=" + address + "&" + "&CA&key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss";
+    public class DestinationClass extends AsyncTask<String, Void, String> {
+        OkHttpClient client = new OkHttpClient();
 
-        // Output format
-        String output = "json";
+        @Override
+        protected String doInBackground(String... address) {
+            StringBuffer sb = new StringBuffer();
+            for(int i = 0; i < address.length; i++) {
+                sb.append(address[i]);
+            }
+            String addressReal = sb.toString();
+            addressReal = addressReal.replace(" ", "%20");
+            String parameters = "key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss&address=" + addressReal;
+            String url = "https://www.googleapis.com/civicinfo/v2/voterinfo?" + parameters;
+            Log.d("url6", url);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
 
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/geocode/" + output + "?" + parameters;
-        Log.d("url2", url + "");
-
-        DataClass runner = new DataClass();
-        String url2 = runner.doInBackground(url);
-        return url2;
+            try (Response response = client.newCall(request).execute()) {
+                return response.body().string();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
     }
 }

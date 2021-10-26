@@ -41,7 +41,7 @@ public class EnterAddress extends AppCompatActivity {
     }
 
     public void sendMessage2(View view) {
-        Address = "1 morningside drive";
+        Address = "1 Morningside Drive";
         Intent intent2 = new Intent(this, Notifications.class);
         intent2.putExtra("message", Address);
         startActivity(intent2);
