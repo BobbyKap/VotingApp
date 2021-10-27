@@ -51,9 +51,7 @@ import okhttp3.ResponseBody;
 
 public class PollingLocation extends FragmentActivity implements OnMapReadyCallback {
 
-    private SupportMapFragment mapFragment;
     private GoogleMap mMap;
-    private ActivityPollingLocationBinding binding;
     LatLng origin = new LatLng(0, 0);
     LatLng dest = new LatLng(0, 0);
     ProgressDialog progressDialog;
@@ -65,8 +63,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
 
         Bundle bundle = getIntent().getExtras();
-        String message = bundle.getString("message");
-        messageThrough = message;
+        messageThrough = bundle.getString("message");
 
         //Returns
         OriginClass originRunner = new OriginClass();
@@ -81,13 +78,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
             Log.d("Origin", String.valueOf(origin));
             Log.d("DebugLat", String.valueOf(LatReal));
             Log.d("DebugLng", String.valueOf(LngReal));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -107,19 +98,13 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
             else if (Integer.parseInt(node.get("error").get("code").toString()) == 400) {
                 Log.d("ElectionAvailable:", "No Elections are available right now.");
             }
-        } catch(JsonProcessingException e){
-                e.printStackTrace();
-            } catch(IOException e){
-                e.printStackTrace();
-            } catch(InterruptedException e){
-                e.printStackTrace();
-            } catch(ExecutionException e){
+        } catch(IOException | ExecutionException | InterruptedException e){
                 e.printStackTrace();
             }
-        binding = ActivityPollingLocationBinding.inflate(getLayoutInflater());
+        com.example.votingapp.databinding.ActivityPollingLocationBinding binding = ActivityPollingLocationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         drawPolyLines();
@@ -159,6 +144,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(origin, 15));
 
     }
+    @SuppressLint("StaticFieldLeak")
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -185,6 +171,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
 
         }
     }
+    @SuppressLint("StaticFieldLeak")
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         // Parsing the data in non-ui thread
@@ -260,10 +247,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         String output = "json";
 
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-
-
-        return url;
+        return "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
     }
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
@@ -280,7 +264,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
 
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             String line = "";
             while ((line = br.readLine()) != null) {
@@ -301,14 +285,14 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         return data;
     }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public class OriginClass extends AsyncTask<String, Void, String> {
+    public static class OriginClass extends AsyncTask<String, Void, String> {
         OkHttpClient client = new OkHttpClient();
 
         @Override
         protected String doInBackground(String... address) {
-            StringBuffer sb = new StringBuffer();
-            for(int i = 0; i < address.length; i++) {
-                sb.append(address[i]);
+            StringBuilder sb = new StringBuilder();
+            for (String s : address) {
+                sb.append(s);
             }
             String addressReal = sb.toString();
             addressReal = addressReal.replace(" ", "%20");
@@ -329,14 +313,14 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         }
     }
 
-    public class DestinationClass extends AsyncTask<String, Void, String> {
+    public static class DestinationClass extends AsyncTask<String, Void, String> {
         OkHttpClient client = new OkHttpClient();
 
         @Override
         protected String doInBackground(String... address) {
-            StringBuffer sb = new StringBuffer();
-            for(int i = 0; i < address.length; i++) {
-                sb.append(address[i]);
+            StringBuilder sb = new StringBuilder();
+            for (String s : address) {
+                sb.append(s);
             }
             String addressReal = sb.toString();
             addressReal = addressReal.replace(" ", "%20");

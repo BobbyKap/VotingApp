@@ -13,7 +13,8 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    String get;
+    String address;
+    Boolean contains;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,34 +22,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         createNotificationChannel();
-
         Button button = findViewById(R.id.button345);
 
-        SharedPreferences mPrefs = getSharedPreferences("address", 0);
-        get = mPrefs.getString("key", null);
-        if(get != null){
-            button.performClick();
-        }
+        SharedPreferences preferences = getSharedPreferences("address", 0);
+        address = preferences.getString("address", null);
+        button.performClick();
     }
 
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "main";
-            String description = "Main Channel";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel("main", name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
+        CharSequence name = "main";
+        String description = "Main Channel";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel channel = new NotificationChannel("main", name, importance);
+        channel.setDescription(description);
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
     }
 
     public void sendMessage(View view) {
         Intent intent = new Intent(this, EnterAddress.class);
+        intent.putExtra("message", address);
         startActivity(intent);
     }
 }
