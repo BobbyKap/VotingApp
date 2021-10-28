@@ -13,20 +13,20 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    String address;
-    Boolean contains;
+    String key1 = "address";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         createNotificationChannel();
-        Button button = findViewById(R.id.button345);
 
         SharedPreferences preferences = getSharedPreferences("address", 0);
-        address = preferences.getString("address", null);
-        button.performClick();
+        String serverDataKey1 = preferences.getString(key1, null);
+        if(serverDataKey1 != null){
+            Button button = findViewById(R.id.button1);
+            button.performClick();
+        }
     }
 
     private void createNotificationChannel() {
@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendMessage(View view) {
         Intent intent = new Intent(this, EnterAddress.class);
-        intent.putExtra("message", address);
         startActivity(intent);
     }
 }

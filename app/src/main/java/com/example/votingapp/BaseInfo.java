@@ -10,6 +10,7 @@ import android.view.View;
 public class BaseInfo extends AppCompatActivity {
 
     String messageThrough;
+    String key2 = "notification";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +23,9 @@ public class BaseInfo extends AppCompatActivity {
 
     public void back(View view){
         Intent intent2 = new Intent(this, Notifications.class);
-        SharedPreferences preferences = getSharedPreferences("Address", 0);
-        preferences.edit().remove("key2").commit();
+        SharedPreferences preferences = getSharedPreferences("bool", 0);
+        preferences.edit().remove(key2).apply();
+        intent2.putExtra("message", messageThrough);
         startActivity(intent2);
     }
 

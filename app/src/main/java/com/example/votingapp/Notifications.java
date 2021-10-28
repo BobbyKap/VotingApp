@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,56 +14,83 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 public class Notifications extends AppCompatActivity {
 
     String messageThrough;
+    Boolean serverData;
+    String formattedAddress;
+    String key = "address";
+    String key2 = "notification";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
+        CheckBox checkBox = findViewById(R.id.checkBox1);
         Bundle bundle = getIntent().getExtras();
         messageThrough = bundle.getString("message");
+        Log.d("MessageThrough", messageThrough);
 
-        SharedPreferences mPrefs = getSharedPreferences("bool", 0);
-        boolean get1 = mPrefs.getBoolean("key2", false);
+        SharedPreferences preferences = getSharedPreferences("bool", 0);
+        serverData = preferences.getBoolean(key2, false);
 
-        if(!get1)
+        if(serverData){
             notification();
-        else{
             Button button = findViewById(R.id.button4);
             button.performClick();
+        }
+        else {
+            if(checkBox.isChecked()){
+                notification();
+                preferences.edit().putBoolean(key2, true).apply();
+            }
         }
     }
 
     public void notification() {
-        SharedPreferences mPrefs = getSharedPreferences("address", 0);
-        Boolean get1 = mPrefs.getBoolean("key2", false);
-
-        CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
         Intent intent = new Intent(this, BaseInfo.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        intent.putExtra("message", messageThrough);
+
+        PollingLocation.DestinationClass destRunner = new PollingLocation.DestinationClass();
+        try {
+            @SuppressLint("WrongThread") final JsonNode node = new ObjectMapper().readTree((destRunner.execute(messageThrough)).get());
+            String line1 = node.get("pollingLocations").get(0).get("address").get("line1").toString().replace("\"", "");
+            String city = node.get("pollingLocations").get(0).get("address").get("city").toString().replace("\"", "");
+            String state = node.get("pollingLocations").get(0).get("address").get("state").toString().replace("\"", "");
+            String zip = node.get("pollingLocations").get(0).get("address").get("zip").toString().replace("\"", " ");
+            formattedAddress = line1 + ", " + city + ", " + state + ", " + zip;
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "main")
                 .setSmallIcon(R.drawable.notification_icon)
-                .setContentTitle("Notifications Example")
-                .setContentText("This is a test notification")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentTitle("Your Polling Center is located at: " + formattedAddress)
+                .setContentText("Get directions to your Polling Center!")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(1, builder.build());
-        SharedPreferences.Editor mEditor = mPrefs.edit();
-        mEditor.putBoolean("key2", true).apply();
+
+        SharedPreferences preferences = getSharedPreferences("bool", 0);
+        preferences.edit().putBoolean(key2, true).apply();
     }
 
 
     public void back(View view){
         Intent intent2 = new Intent(this, EnterAddress.class);
         SharedPreferences preferences = getSharedPreferences("address", 0);
-        preferences.edit().remove("address").apply();
-        Log.d("addresskey", preferences.getString("address", "null"));
+        preferences.edit().remove(key).apply();
         startActivity(intent2);
     }
 

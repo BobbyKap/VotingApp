@@ -2,6 +2,7 @@ package com.example.votingapp;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -84,7 +85,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
 
         try {
             @SuppressLint("WrongThread") final JsonNode node = new ObjectMapper().readTree((destinationRunner.execute(messageThrough)).get());
-            if(node.get("election").get("id") != null){
+            if(node.get("election").get("id") != null) {
                 id = node.get("election").get("id").toString();
                 String nodeLat = node.get("pollingLocations").get(0).get("latitude").toString();
                 String nodeLng = node.get("pollingLocations").get(0).get("longitude").toString();
@@ -98,6 +99,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
             else if (Integer.parseInt(node.get("error").get("code").toString()) == 400) {
                 Log.d("ElectionAvailable:", "No Elections are available right now.");
             }
+
         } catch(IOException | ExecutionException | InterruptedException e){
                 e.printStackTrace();
             }

@@ -45,7 +45,7 @@
         app:layout_constraintVertical_bias="0.093" />
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/checkBox1"
         android:layout_width="94dp"
         android:layout_height="53dp"
         android:text="Yes"

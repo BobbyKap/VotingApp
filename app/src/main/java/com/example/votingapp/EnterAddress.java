@@ -12,33 +12,38 @@ import android.widget.EditText;
 
 public class EnterAddress extends AppCompatActivity {
 
-    String Address;
     String messageThrough;
+    String serverData;
     EditText AddressInput;
-    Button ButtonInput;
-    Boolean contains;
+    String key = "address";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter_address);
-        Bundle bundle = getIntent().getExtras();
-        messageThrough = bundle.getString("message");
+
+        SharedPreferences preferences = getSharedPreferences("address", 0);
+        serverData = preferences.getString(key, null);
+        if(serverData != null){
+            Button button = findViewById(R.id.button2);
+            button.performClick();
+        }
+
     }
 
     public void sendMessage2(View view) {
-        AddressInput = (EditText) findViewById(R.id.AddressInput);
-        ButtonInput = (Button) findViewById(R.id.button2);
-        if(AddressInput.getText().length() == 0){
-            if (!AddressInput.getText().toString().equals(messageThrough)) {
-                messageThrough = AddressInput.getText().toString();
-            }
+        AddressInput = findViewById(R.id.AddressInput);
+        if(serverData == null) {
+            messageThrough = AddressInput.getText().toString();
+            SharedPreferences preferencesEditor = getSharedPreferences("address", 0);
+            preferencesEditor.edit().putString(key, messageThrough).apply();
         }
-        else {
-            Log.e("Error", "No string inputted");
-        }
+        else
+            messageThrough = serverData;
+
         Intent intent2 = new Intent(this, Notifications.class);
         intent2.putExtra("message", messageThrough);
+        Log.d("MessageThrough", messageThrough);
         startActivity(intent2);
     }
 }
