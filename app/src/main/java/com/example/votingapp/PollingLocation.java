@@ -2,20 +2,17 @@ package com.example.votingapp;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+
 import java.net.URL;
 import java.util.HashMap;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.votingapp.databinding.ActivityPollingLocationBinding;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,8 +24,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -36,18 +31,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 
 public class PollingLocation extends FragmentActivity implements OnMapReadyCallback {
@@ -58,6 +48,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
     ProgressDialog progressDialog;
     String messageThrough;
     String id;
+    String destReal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,12 +80,14 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
                 id = node.get("election").get("id").toString();
                 String nodeLat = node.get("pollingLocations").get(0).get("latitude").toString();
                 String nodeLng = node.get("pollingLocations").get(0).get("longitude").toString();
+                String destRealLine1 = node.get("pollingLocations").get(0).get("address").get("line1").toString().replace("\"", "");
+                String destRealCity = node.get("pollingLocations").get(0).get("address").get("city").toString().replace("\"", "");
+                String destRealState = node.get("pollingLocations").get(0).get("address").get("state").toString().replace("\"", "");
+                String destRealZip = node.get("pollingLocations").get(0).get("address").get("zip").toString().replace("\"", "");
+                destReal = destRealLine1 + ", " + destRealCity + ", " + destRealState + ", " + destRealZip;
                 double LatReal = Double.parseDouble(nodeLat);
                 double LngReal = Double.parseDouble(nodeLng);
                 dest = new LatLng(LatReal, LngReal);
-                Log.d("Dest", String.valueOf(dest));
-                Log.d("DebugLat", String.valueOf(LatReal));
-                Log.d("DebugLng", String.valueOf(LngReal));
             }
             else {
                 Log.d("ElectionAvailable:", "No Elections are available right now.");
@@ -126,7 +119,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         // Checks, whether start and end locations are captured
         // Getting URL to the Google Directions API
         String url = getDirectionsUrl(origin, dest);
-        Log.d("url", url + "");
+        Log.d("Directions", url + "");
         DownloadTask downloadTask = new DownloadTask();
         // Start downloading json data from Google Directions API
         downloadTask.execute(url);
@@ -137,7 +130,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.addMarker(new MarkerOptions()
                 .position(origin)
-                .title("LinkedIn")
+                .title("Destination: ")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
         googleMap.addMarker(new MarkerOptions()
@@ -199,11 +192,11 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
 
             progressDialog.dismiss();
             Log.d("result", result.toString());
-            ArrayList points = null;
+            ArrayList<LatLng> points = null;
             PolylineOptions lineOptions = null;
 
             for (int i = 0; i < result.size(); i++) {
-                points = new ArrayList();
+                points = new ArrayList<>();
                 lineOptions = new PolylineOptions();
 
                 List<HashMap<String, String>> path = result.get(i);
@@ -301,7 +294,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
             String parameters = "address=" + addressReal + "&" + "&CA&key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss";
             String output = "json";
             String url = "https://maps.googleapis.com/maps/api/geocode/" + output + "?" + parameters;
-            Log.d("url5", url);
+            Log.d("Geocode", url);
             Request request = new Request.Builder()
                     .url(url)
                     .build();
@@ -328,7 +321,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
             addressReal = addressReal.replace(" ", "%20");
             String parameters = "key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss&address=" + addressReal;
             String url = "https://www.googleapis.com/civicinfo/v2/voterinfo?" + parameters;
-            Log.d("url6", url);
+            Log.d("CivicInfo", url);
             Request request = new Request.Builder()
                     .url(url)
                     .build();

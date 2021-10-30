@@ -7,6 +7,23 @@
     android:background="@color/color3"
     tools:context=".ElectionInfo">
 
+    <Spinner
+        android:id="@+id/spinnerEI"
+        android:layout_width="90dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:drawable/btn_dropdown"
+        android:defaultFocusHighlightEnabled="true"
+        android:forceDarkAllowed="false"
+        android:spinnerMode="dropdown"
+        android:tag="Menu:"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/choice1"
         android:layout_width="310dp"

@@ -11,8 +11,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Spinner;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-public class Notifications extends AppCompatActivity {
+public class Notifications extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     String messageThrough;
     Boolean serverData;
@@ -36,7 +39,6 @@ public class Notifications extends AppCompatActivity {
         CheckBox checkBox = findViewById(R.id.checkBox1);
         Bundle bundle = getIntent().getExtras();
         messageThrough = bundle.getString("message");
-        Log.d("MessageThrough", messageThrough);
 
         SharedPreferences preferences = getSharedPreferences("bool", 0);
         serverData = preferences.getBoolean(key2, false);
@@ -52,6 +54,49 @@ public class Notifications extends AppCompatActivity {
                 preferences.edit().putBoolean(key2, true).apply();
             }
         }
+        Spinner spinner = (Spinner) findViewById(R.id.spinnerN);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.menu_list, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(0, false);
+        spinner.setSelection(1, false);
+        spinner.setSelection(2, false);
+        spinner.setSelection(3, false);
+        spinner.setOnItemSelectedListener(this);
+    }
+
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        if(pos==0){
+            Intent intent = new Intent(this, MainActivity.class);
+            SharedPreferences preferences = getSharedPreferences("address", 0);
+            preferences.edit().remove("address").apply();
+            preferences.edit().remove("notification").apply();
+            startActivity(intent);
+        }
+        if(pos==1){
+            Intent intent = new Intent(this, EnterAddress.class);
+            SharedPreferences preferences = getSharedPreferences("address", 0);
+            preferences.edit().remove("address").apply();
+            preferences.edit().remove("notification").apply();
+            intent.putExtra("message", messageThrough);
+            startActivity(intent);
+        }
+        if(pos==2){
+            Intent intent = new Intent(this, Notifications.class);
+            SharedPreferences preferences = getSharedPreferences("address", 0);
+            preferences.edit().remove("notification").apply();
+            intent.putExtra("message", messageThrough);
+            startActivity(intent);
+        }
+        if(pos==3){
+            Intent intent = new Intent(this, BaseInfo.class);
+            intent.putExtra("message", messageThrough);
+            startActivity(intent);
+        }
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     public void notification() {
