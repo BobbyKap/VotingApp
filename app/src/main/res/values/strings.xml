@@ -2,4 +2,20 @@
     <string name="app_name">Voting App</string>
     <string name="google_maps_key">AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss</string>
     <string name="title_activity_polling_location">PollingLocation</string>
+    <string name="button">Button</string>
+    <string name="do_not_select_if_you_do_not_want_to_recieve_notifications">Do not select if you do not want to recieve notifications.</string>
+    <string name="sign_up">SIGN UP!</string>
+    <string name="can_we_send_you_notifications">Can we send you notifications?</string>
+    <string name="yes">Yes</string>
+    <string name="next">Next</string>
+    <string name="we_will_only_notify_you_regarding_changes_to_your_polling_location_or_changes_in_election_information">We will only notify you regarding changes to your polling location or changes in election information.</string>
+    <string name="dont_worry_we_will_not_share_this_info_with_anyone_else">Dont worry, we will not share this info with anyone else. :)</string>
+    <string name="what_is_your_current_address">What is your current address?</string>
+    <string name="address">Address:</string>
+    <string name="learn_more_about_your">Learn more about your:</string>
+    <string name="back">Back</string>
+    <string name="the_next_election_is_on">The next election is on:</string>
+    <string name="election_information">Election Information</string>
+    <string name="polling_location">polling location</string>
+    <string name="what_election_would_you_like_to_see_the_canidates_for">What election would you like to see the canidates for?</string>
 </resources>

@@ -96,7 +96,7 @@ public class PollingLocation extends FragmentActivity implements OnMapReadyCallb
                 Log.d("DebugLat", String.valueOf(LatReal));
                 Log.d("DebugLng", String.valueOf(LngReal));
             }
-            else if (Integer.parseInt(node.get("error").get("code").toString()) == 400) {
+            else {
                 Log.d("ElectionAvailable:", "No Elections are available right now.");
             }
 

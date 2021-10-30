@@ -5,70 +5,63 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color3"
-    tools:context=".EnterAddress">
+    tools:context=".ElectionInfoCandidates.Election2">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="0dp"
-        android:layout_height="84dp"
-        android:text="@string/what_is_your_current_address"
-        android:textAlignment="center"
-        android:textColor="@color/color4"
-        android:textSize="35sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.132" />
-
-    <EditText
-        android:id="@+id/AddressInput"
-        android:layout_width="350dp"
-        android:layout_height="50dp"
-        android:ems="15"
-        android:hint="@string/address"
-        android:importantForAutofill="no"
-        android:inputType="textPostalAddress"
-        android:minHeight="48dp"
-        android:textColor="@color/color5"
-        android:textColorHint="@color/color5"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.478"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.292" />
-
-    <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/candidate21party"
         android:layout_width="wrap_content"
-        android:layout_height="61dp"
-        android:text="@string/dont_worry_we_will_not_share_this_info_with_anyone_else"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@color/color5"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias=".15" />
+
+    <TextView
+        android:id="@+id/candidate22party"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@color/color5"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias=".5" />
+
+    <TextView
+        android:id="@+id/candidate21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textColor="@color/color4"
         android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.976" />
+        app:layout_constraintVertical_bias=".22" />
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="310dp"
-        android:layout_height="55dp"
-        android:background="@color/color2"
-        android:onClick="sendMessage2"
-        android:text="@string/next"
+    <TextView
+        android:id="@+id/candidate22"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textColor="@color/design_default_color_on_primary"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textColor="@color/color4"
+        android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.423" />
-
+        app:layout_constraintVertical_bias=".57" />
 </androidx.constraintlayout.widget.ConstraintLayout>

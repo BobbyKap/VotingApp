@@ -3,109 +3,76 @@ package com.example.votingapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.votingapp.ElectionInfoCandidates.Election1;
+import com.example.votingapp.ElectionInfoCandidates.Election2;
+import com.example.votingapp.ElectionInfoCandidates.Election3;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class ElectionInfo extends AppCompatActivity {
 
     String messageThrough;
+    ArrayList<String> candidates = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Bundle bundle = getIntent().getExtras();
         messageThrough = bundle.getString("message");
-        String id;
-
-        GetIdClass getIdRunner = new GetIdClass();
-        ElectionInfoClass electionInfoRunner = new ElectionInfoClass();
-
-        try {
-            @SuppressLint("WrongThread") final JsonNode node = new ObjectMapper().readTree((getIdRunner.execute(messageThrough)).get());
-            if(node.get("election").get("id") != null) {
-                id = node.get("election").get("id").toString();
-                Log.d("id", id);
-            }
-            else {
-                Log.d("ElectionAvailable:", "No elections are available right now.");
-            }
-        } catch (JsonProcessingException | InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            @SuppressLint("WrongThread") final JsonNode node = new ObjectMapper().readTree((electionInfoRunner.execute(messageThrough)).get());
-        } catch (JsonProcessingException | InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
         setContentView(R.layout.activity_election_info);
+
+        Button button1 = findViewById(R.id.choice1);
+        Button button2 = findViewById(R.id.choice2);
+        Button button3 = findViewById(R.id.choice3);
+        run();
+        Log.d("Candidates", Arrays.toString(candidates.toArray()));
+        button1.setText(candidates.get(0));
+        button2.setText(candidates.get(1));
+        button3.setText(candidates.get(2));
+
     }
 
-    public static class ElectionInfoClass extends AsyncTask<String, Void, String> {
-        OkHttpClient client = new OkHttpClient();
-
-        @Override
-        protected String doInBackground(String... address) {
-            StringBuilder sb = new StringBuilder();
-            for (String s : address) {
-                sb.append(s);
+    public void run(){
+        PollingLocation.DestinationClass destRunner = new PollingLocation.DestinationClass();
+        try {
+            @SuppressLint("WrongThread") final JsonNode node = new ObjectMapper().readTree((destRunner.execute(messageThrough)).get());
+            for(int i = 0; i <= 3; i++) {
+                String office = node.get("contests").get(i).get("office").toString().replace("\"", "");
+                candidates.add(office);
             }
-            String addressReal = sb.toString();
-            addressReal = addressReal.replace(" ", "%20");
-            String parameters = "key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss&address=" + addressReal;
-            String url = "https://www.googleapis.com/civicinfo/v2/voterinfo?" + parameters;
-            Log.d("url6", url);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-
-            try (Response response = client.newCall(request).execute()) {
-                return response.body().string();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+            Log.d("Candidates", Arrays.toString(candidates.toArray()));
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
     }
 
-    public static class GetIdClass extends AsyncTask<String, Void, String> {
-        OkHttpClient client = new OkHttpClient();
+    public void choice1(View v){
+        Intent intent = new Intent(this, Election1.class);
+        intent.putExtra("message", messageThrough);
+        startActivity(intent);
+    }
 
-        @Override
-        protected String doInBackground(String... address) {
-            StringBuffer sb = new StringBuffer();
-            for (String s : address) {
-                sb.append(s);
-            }
-            String addressReal = sb.toString();
-            addressReal = addressReal.replace(" ", "%20");
-            String parameters = "key=AIzaSyCiyPGnl5Dq2tGyY04_KkbJZVAhAl1Gpss&address=" + addressReal;
-            String url = "https://www.googleapis.com/civicinfo/v2/voterinfo?" + parameters;
-            Log.d("url6", url);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
+    public void choice2(View v){
+        Intent intent = new Intent(this, Election2.class);
+        intent.putExtra("message", messageThrough);
+        startActivity(intent);
+    }
 
-            try (Response response = client.newCall(request).execute()) {
-                return response.body().string();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
+    public void choice3(View v){
+        Intent intent = new Intent(this, Election3.class);
+        intent.putExtra("message", messageThrough);
+        startActivity(intent);
     }
 }
